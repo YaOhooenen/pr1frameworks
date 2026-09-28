@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1,
+    "room_id": 2,
+    "task_date": "2026-12-22",
+    "description": "",
+    "is_cancelled": true
+  },
+  {
+    "id": 2,
+    "room_id": 3,
+    "task_date": "2026-12-23",
+    "description": "",
+    "is_cancelled": false
+  }
+]
