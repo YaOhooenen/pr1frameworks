@@ -12,5 +12,12 @@
     "task_date": "2026-12-23",
     "description": "",
     "is_cancelled": false
+  },
+  {
+    "id": 3,
+    "room_id": 2,
+    "task_date": "2022-12-12",
+    "description": "Отбеливание Ануса",
+    "is_cancelled": false
   }
 ]

@@ -1,0 +1,9 @@
+{% if task.is_cancelled %}
+    <span class="badge bg-secondary task-status task-status-cancelled">
+        Отменена
+    </span>
+{% else %}
+    <span class="badge bg-success task-status task-status-active">
+        Активна
+    </span>
+{% endif %}

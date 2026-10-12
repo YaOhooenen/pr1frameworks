@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {% if task %}Задача №{{ task.id }} — Уборка{% else %}Не найдено{% endif %}
+{% endblock %}
+
+{% block content %}
+{% if task %}
+    <div class="card">
+        <div class="card-body">
+            <h1 class="card-title">Задача №{{ task.id }}</h1>
+
+            <p class="card-text">
+                <strong>Помещение:</strong>
+                {{ task.room.name }}
+                (вместимость {{ task.room.capacity }} чел.)
+            </p>
+
+            <p class="card-text">
+                <strong>Дата уборки:</strong>
+                {{ task.task_date }}
+            </p>
+
+            <p class="card-text">
+                <strong>Описание:</strong>
+                {{ task.description|default:"—" }}
+            </p>
+
+            <p class="card-text">
+                <strong>Статус:</strong>
+                {% include "tasks/includes/task_status.html" %}
+            </p>
+        </div>
+    </div>
+{% else %}
+    <h1 class="text-danger">Задача не найдена</h1>
+    <p>Задача с указанным идентификатором отсутствует.</p>
+{% endif %}
+
+<a href="{% url 'tasks:list' %}" class="btn btn-outline-secondary mt-3">
+    ← к списку задач
+</a>
+{% endblock %}

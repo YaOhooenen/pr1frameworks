@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Заказы — Уборка{% endblock %}
+
+{% block content %}
+<h1>Заказы</h1>
+<p>Всего заказов: {{ orders|length }}</p>
+
+{% if orders %}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Помещение</th>
+            <th>Дата задачи</th>
+            <th>Дата оформления</th>
+            <th>Заказчик</th>
+            <th>Статус</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for order in orders %}
+        <tr>
+            <td>
+                <a href="{% url 'orders:detail' order.id %}">
+                    №{{ order.id }}
+                </a>
+            </td>
+            <td>{{ order.task.room.name }}</td>
+            <td>{{ order.task.task_date }}</td>
+            <td>{{ order.order_date }}</td>
+            <td>{{ order.user.name }}</td>
+            <td>
+                {% include "orders/includes/order_status.html" %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>Заказы не найдены.</p>
+{% endif %}
+{% endblock %}

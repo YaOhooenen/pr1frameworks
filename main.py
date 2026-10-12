@@ -1,30 +1,29 @@
 """Система планирования уборки — точка запуска."""
 from models.rooms import (
     add_room, find_room, check_room_capacity,
-    show_rooms, find_room_by_id,
+    sort_rooms_by_capacity, show_rooms, find_room_by_id,
 )
 from models.users import (
-    add_user, show_users, find_user_by_id,
+    add_user, find_user, show_users, find_user_by_id,
 )
 from models.tasks import (
     is_room_available, create_task, cancel_task,
     get_task_status, show_tasks, find_task_by_id,
 )
-from models.schedule import (
-    add_schedule, show_schedules,
-    find_schedules_by_user, find_schedules_by_room,
+from models.orders import (
+    create_order, cancel_order, show_orders,
+    find_orders_by_user, find_orders_by_room,
 )
 from storage import (
     load_rooms, save_rooms,
     load_users, save_users,
     load_tasks, save_tasks,
-    load_schedules, save_schedules,
+    load_orders, save_orders,
 )
 from utils import input_int, input_date
 
 
 def menu() -> None:
-    """Вывести главное меню."""
     print("\n=== Система планирования уборки ===")
     print("1. Показать помещения")
     print("2. Добавить помещение")
@@ -36,23 +35,25 @@ def menu() -> None:
     print("8. Создать задачу уборки")
     print("9. Отменить задачу")
     print("10. Показать все задачи")
-    print("11. Составить расписание (заказ)")
-    print("12. Показать расписание")
-    print("13. Расписание по заказчику")
-    print("14. Расписание по помещению")
+    print("11. Оформить заказ на задачу")
+    print("12. Отменить заказ")
+    print("13. Показать все заказы")
+    print("14. Заказы по заказчику")
+    print("15. Заказы по помещению")
+    print("16. Помещения по вместимости")
     print("0. Выход")
 
 
 def create_new_task(tasks, rooms):
-    """Создать задачу уборки через диалог."""
-    room_id = input_int("ID помещения: ")
-    room = find_room_by_id(rooms, room_id)
+    """Создать задачу уборки."""
+    rid = input_int("ID помещения: ")
+    room = find_room_by_id(rooms, rid)
     if room is None:
         print("Помещение не найдено.")
         return None
-    task_date = input_date("Дата уборки (ДД.ММ.ГГГГ): ")
-    description = input("Описание задачи: ")
-    task = create_task(tasks, room, task_date, description)
+    d = input_date("Дата уборки (ДД.ММ.ГГГГ): ")
+    desc = input("Описание задачи: ")
+    task = create_task(tasks, room, d, desc)
     if task is None:
         print("Помещение занято на эту дату.")
         return None
@@ -60,37 +61,31 @@ def create_new_task(tasks, rooms):
     return task
 
 
-def create_new_schedule(schedules, tasks, rooms, users) -> None:
-    """Пользовательский сценарий: заказчик заказывает уборку."""
-    user_id = input_int("ID заказчика: ")
-    user = find_user_by_id(users, user_id)
+def create_new_order(orders, users, tasks):
+    """Оформить заказ на существующую задачу."""
+    uid = input_int("ID заказчика: ")
+    user = find_user_by_id(users, uid)
     if user is None:
         print("Пользователь не найден.")
         return
 
-    room_id = input_int("ID помещения: ")
-    room = find_room_by_id(rooms, room_id)
-    if room is None:
-        print("Помещение не найдено.")
-        return
-
-    task_id = input_int("ID задачи: ")
-    task = find_task_by_id(tasks, task_id)
+    tid = input_int("ID задачи: ")
+    task = find_task_by_id(tasks, tid)
     if task is None:
         print("Задача не найдена.")
         return
 
-    scheduled_date = input_date("Дата по расписанию (ДД.ММ.ГГГГ): ")
-    record = add_schedule(schedules, task, room, user, scheduled_date)
-    print(f"Расписание №{record.id} создано.")
+    d = input_date("Дата оформления заказа (ДД.ММ.ГГГГ): ")
+    order = create_order(orders, user, task, d)
+    print(f"Заказ №{order.id} оформлен.")
+    print(order)
 
 
 def main() -> None:
-    """Точка запуска приложения."""
     rooms = load_rooms()
     users = load_users()
     tasks = load_tasks(rooms)
-    schedules = load_schedules(rooms, users, tasks)
+    orders = load_orders(users, tasks)
 
     while True:
         menu()
@@ -99,34 +94,28 @@ def main() -> None:
         if choice == "1":
             show_rooms(rooms)
         elif choice == "2":
-            name = input("Название: ")
-            cap = input_int("Вместимость: ")
-            add_room(rooms, name, cap)
+            add_room(rooms, input("Название: "),
+                     input_int("Вместимость: "))
             save_rooms(rooms)
         elif choice == "3":
-            query = input("Подстрока: ")
-            show_rooms(find_room(rooms, query))
+            show_rooms(find_room(rooms, input("Подстрока: ")))
         elif choice == "4":
             rid = input_int("ID помещения: ")
             mc = input_int("Мин. вместимость: ")
-            if check_room_capacity(rooms, rid, mc):
-                print("Подходит.")
-            else:
-                print("Не подходит.")
+            print("Подходит." if check_room_capacity(rooms, rid, mc)
+                  else "Не подходит.")
         elif choice == "5":
             show_users(users)
         elif choice == "6":
-            name = input("Имя: ")
-            email = input("Email: ")
-            add_user(users, name, email)
+            add_user(users, input("Имя: "), input("Email: "))
             save_users(users)
         elif choice == "7":
             rid = input_int("ID помещения: ")
             room = find_room_by_id(rooms, rid)
             if room:
                 d = input_date("Дата (ДД.ММ.ГГГГ): ")
-                status = is_room_available(tasks, room, d)
-                print(get_task_status(status))
+                print(get_task_status(
+                    is_room_available(tasks, room, d)))
         elif choice == "8":
             create_new_task(tasks, rooms)
             save_tasks(tasks)
@@ -135,28 +124,31 @@ def main() -> None:
             if cancel_task(tasks, tid):
                 save_tasks(tasks)
                 print("Задача отменена.")
-            else:
-                print("Задача не найдена.")
         elif choice == "10":
             show_tasks(tasks)
         elif choice == "11":
-            create_new_schedule(schedules, tasks, rooms, users)
-            save_schedules(schedules)
+            create_new_order(orders, users, tasks)
+            save_orders(orders)
         elif choice == "12":
-            show_schedules(schedules)
+            oid = input_int("ID заказа: ")
+            if cancel_order(orders, oid):
+                save_orders(orders)
+                print("Заказ отменён.")
         elif choice == "13":
-            uid = input_int("ID заказчика: ")
-            found = find_schedules_by_user(schedules, uid)
-            show_schedules(found)
+            show_orders(orders)
         elif choice == "14":
+            uid = input_int("ID заказчика: ")
+            show_orders(find_orders_by_user(orders, uid))
+        elif choice == "15":
             rid = input_int("ID помещения: ")
-            found = find_schedules_by_room(schedules, rid)
-            show_schedules(found)
+            show_orders(find_orders_by_room(orders, rid))
+        elif choice == "16":
+            show_rooms(sort_rooms_by_capacity(rooms))
         elif choice == "0":
             save_rooms(rooms)
             save_users(users)
             save_tasks(tasks)
-            save_schedules(schedules)
+            save_orders(orders)
             print("Выход.")
             break
         else:

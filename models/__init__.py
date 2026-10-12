@@ -2,6 +2,6 @@
 from .rooms import Room
 from .users import User
 from .tasks import CleaningTask
-from .schedule import Schedule
+from .orders import Order
 
-__all__ = ["Room", "User", "CleaningTask", "Schedule"]
+__all__ = ["Room", "User", "CleaningTask", "Order"]

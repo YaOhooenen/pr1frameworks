@@ -1,0 +1,9 @@
+{% if order.is_cancelled %}
+    <span class="badge bg-secondary order-status order-status-cancelled">
+        Отменён
+    </span>
+{% else %}
+    <span class="badge bg-success order-status order-status-active">
+        Активен
+    </span>
+{% endif %}

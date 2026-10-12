@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {% if user %}{{ user.name }} — Уборка{% else %}Не найдено{% endif %}
+{% endblock %}
+
+{% block content %}
+{% if user %}
+    <div class="card">
+        <div class="card-body">
+            <h1 class="card-title">{{ user.name }}</h1>
+
+            <p class="card-text">
+                <strong>ID:</strong> {{ user.id }}
+            </p>
+
+            <p class="card-text">
+                <strong>Email:</strong> {{ user.email }}
+            </p>
+        </div>
+    </div>
+{% else %}
+    <h1 class="text-danger">Пользователь не найден</h1>
+    <p>Пользователь с указанным идентификатором отсутствует.</p>
+{% endif %}
+
+<a href="{% url 'users:list' %}" class="btn btn-outline-secondary mt-3">
+    ← к списку пользователей
+</a>
+{% endblock %}

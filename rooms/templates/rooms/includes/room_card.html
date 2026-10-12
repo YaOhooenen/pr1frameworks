@@ -1,0 +1,6 @@
+<li class="list-group-item d-flex justify-content-between">
+    <a href="{% url 'rooms:detail' room.id %}">
+        {{ room.name|default:"Без названия" }}
+    </a>
+    <span>Вместимость: {{ room.capacity }} мест</span>
+</li>

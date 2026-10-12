@@ -1,9 +1,9 @@
-"""Сохранение и загрузка данных с преобразованием в объекты."""
+"""Сохранение и загрузка данных."""
 import json
 import os
 from typing import List
 
-from models import Room, User, CleaningTask, Schedule
+from models import Room, User, CleaningTask, Order
 from models.rooms import find_room_by_id
 from models.users import find_user_by_id
 from models.tasks import find_task_by_id
@@ -28,7 +28,6 @@ def _save_json(filename: str, data: list) -> None:
         print(f"Ошибка записи {filename}: {e}")
 
 
-# --- Rooms ---
 def load_rooms(filename: str = "data/rooms.json") -> List[Room]:
     return [
         Room(item["id"], item["name"], item["capacity"])
@@ -46,7 +45,6 @@ def save_rooms(
     _save_json(filename, data)
 
 
-# --- Users ---
 def load_users(filename: str = "data/users.json") -> List[User]:
     return [User.from_data(item) for item in _load_json(filename)]
 
@@ -61,7 +59,6 @@ def save_users(
     _save_json(filename, data)
 
 
-# --- Tasks ---
 def load_tasks(
     rooms: List[Room],
     filename: str = "data/tasks.json",
@@ -98,43 +95,44 @@ def save_tasks(
     _save_json(filename, data)
 
 
-# --- Schedule ---
-def load_schedules(
-    schedules_rooms: List[Room],
+def load_orders(
     users: List[User],
     tasks: List[CleaningTask],
-    filename: str = "data/schedule.json",
-) -> List[Schedule]:
-    """Загрузить расписание, восстановив связи с Room/User/Task."""
+    filename: str = "data/orders.json",
+) -> List[Order]:
+    """Загрузить заказы, восстановив связи с User и CleaningTask."""
     data = _load_json(filename)
-    schedules = []
+    orders = []
     for item in data:
-        room = find_room_by_id(schedules_rooms, item["room_id"])
         user = find_user_by_id(users, item["user_id"])
         task = find_task_by_id(tasks, item["task_id"])
-        if room is None or user is None or task is None:
-            print(f"Пропущена запись {item['id']}: связи не найдены")
+        if user is None or task is None:
+            print(
+                f"Пропущен заказ {item['id']}: "
+                f"не найден пользователь или задача"
+            )
             continue
-        s = Schedule(
-            item["id"], task, room, user,
-            item["scheduled_date"],
+        order = Order(
+            item["id"], user, task, item["order_date"],
         )
-        schedules.append(s)
-    return schedules
+        order.is_cancelled = item.get("is_cancelled", False)
+        orders.append(order)
+    return orders
 
 
-def save_schedules(
-    schedules: List[Schedule],
-    filename: str = "data/schedule.json",
+def save_orders(
+    orders: List[Order],
+    filename: str = "data/orders.json",
 ) -> None:
+    """Сохранить заказы в JSON (хранятся ID связей)."""
     data = [
         {
-            "id": s.id,
-            "task_id": s.task.id,
-            "room_id": s.room.id,
-            "user_id": s.user.id,
-            "scheduled_date": s.scheduled_date,
+            "id": o.id,
+            "user_id": o.user.id,
+            "task_id": o.task.id,
+            "order_date": o.order_date,
+            "is_cancelled": o.is_cancelled,
         }
-        for s in schedules
+        for o in orders
     ]
     _save_json(filename, data)

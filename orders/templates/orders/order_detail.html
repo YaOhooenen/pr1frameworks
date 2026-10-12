@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {% if order %}Заказ №{{ order.id }} — Уборка{% else %}Не найдено{% endif %}
+{% endblock %}
+
+{% block content %}
+{% if order %}
+    <div class="card">
+        <div class="card-body">
+            <h1 class="card-title">Заказ №{{ order.id }}</h1>
+
+            <p class="card-text">
+                <strong>Помещение:</strong>
+                {{ order.task.room.name }}
+                (вместимость {{ order.task.room.capacity }} чел.)
+            </p>
+
+            <p class="card-text">
+                <strong>Дата задачи:</strong>
+                {{ order.task.task_date }}
+            </p>
+
+            <p class="card-text">
+                <strong>Дата оформления заказа:</strong>
+                {{ order.order_date }}
+            </p>
+
+            <p class="card-text">
+                <strong>Заказчик:</strong>
+                {{ order.user.name }} ({{ order.user.email }})
+            </p>
+
+            <p class="card-text">
+                <strong>Описание:</strong>
+                {{ order.task.description|default:"—" }}
+            </p>
+
+            <p class="card-text">
+                <strong>Статус:</strong>
+                {% include "orders/includes/order_status.html" %}
+            </p>
+        </div>
+    </div>
+{% else %}
+    <h1 class="text-danger">Заказ не найден</h1>
+    <p>Заказ с указанным идентификатором отсутствует.</p>
+{% endif %}
+
+<a href="{% url 'orders:list' %}" class="btn btn-outline-secondary mt-3">
+    ← к списку заказов
+</a>
+{% endblock %}
