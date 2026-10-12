@@ -1,7 +1,7 @@
 """Тесты класса Order."""
 from models import Room, User, CleaningTask, Order
 from models.orders import (
-    create_order, cancel_order,
+    create_order,
     find_orders_by_user, find_orders_by_room,
 )
 

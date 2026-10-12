@@ -1,14 +1,23 @@
 {% extends "base.html" %}
 
-{% block title %}Главная — Уборка{% endblock %}
+{% block title %}Главная — Система планирования уборки{% endblock %}
 
 {% block content %}
 <h1 class="display-4">Система планирования уборки</h1>
-<p class="lead">Веб-версия приложения для планирования уборки.</p>
+<p class="lead">
+    Консольное и веб-приложение для планирования уборки помещений.
+</p>
+<p>Основные разделы:</p>
 <a href="{% url 'rooms:list' %}" class="btn btn-primary me-2">
     Помещения
 </a>
-<a href="{% url 'orders:list' %}" class="btn btn-secondary">
+<a href="{% url 'tasks:list' %}" class="btn btn-info me-2">
+    Задачи
+</a>
+<a href="{% url 'orders:list' %}" class="btn btn-secondary me-2">
     Заказы
+</a>
+<a href="{% url 'users:list' %}" class="btn btn-outline-dark">
+    Пользователи
 </a>
 {% endblock %}

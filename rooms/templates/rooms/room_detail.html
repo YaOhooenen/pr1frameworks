@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
 {% block title %}
-    {% if room %}{{ room.name }} — Уборка{% else %}Не найдено{% endif %}
+    {% if room %}{{ room.name }}{% else %}Помещение не найдено{% endif %}
 {% endblock %}
 
 {% block content %}
 {% if room %}
-    <div class="card room-card">
+    <div class="card">
         <div class="card-body">
             <h1 class="card-title">{{ room.name }}</h1>
             <p class="card-text"><strong>ID:</strong> {{ room.id }}</p>
@@ -19,8 +19,7 @@
     <h1 class="text-danger">Помещение не найдено</h1>
     <p>Помещение с указанным идентификатором отсутствует.</p>
 {% endif %}
-<a href="{% url 'rooms:list' %}"
-   class="btn btn-outline-secondary mt-3">
+<a href="{% url 'rooms:list' %}" class="btn btn-outline-secondary mt-3">
     ← к списку помещений
 </a>
 {% endblock %}

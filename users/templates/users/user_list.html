@@ -1,12 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}Пользователи — Уборка{% endblock %}
+{% block title %}Пользователи{% endblock %}
 
 {% block content %}
 <h1>Пользователи</h1>
 <p>Всего пользователей: {{ users|length }}</p>
 
-{% if users %}
 <table class="table table-striped">
     <thead>
         <tr>
@@ -26,10 +25,11 @@
             <td>{{ user.name }}</td>
             <td>{{ user.email }}</td>
         </tr>
+        {% empty %}
+        <tr>
+            <td colspan="3">Пользователи не найдены.</td>
+        </tr>
         {% endfor %}
     </tbody>
 </table>
-{% else %}
-<p>Пользователи не найдены.</p>
-{% endif %}
 {% endblock %}

@@ -1,12 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}Задачи — Уборка{% endblock %}
+{% block title %}Задачи{% endblock %}
 
 {% block content %}
 <h1>Задачи уборки</h1>
 <p>Всего задач: {{ tasks|length }}</p>
 
-{% if tasks %}
 <table class="table table-striped">
     <thead>
         <tr>
@@ -32,10 +31,11 @@
                 {% include "tasks/includes/task_status.html" %}
             </td>
         </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5">Задачи не найдены.</td>
+        </tr>
         {% endfor %}
     </tbody>
 </table>
-{% else %}
-<p>Задачи не найдены.</p>
-{% endif %}
 {% endblock %}

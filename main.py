@@ -4,7 +4,7 @@ from models.rooms import (
     sort_rooms_by_capacity, show_rooms, find_room_by_id,
 )
 from models.users import (
-    add_user, find_user, show_users, find_user_by_id,
+    add_user, show_users, find_user_by_id,
 )
 from models.tasks import (
     is_room_available, create_task, cancel_task,
